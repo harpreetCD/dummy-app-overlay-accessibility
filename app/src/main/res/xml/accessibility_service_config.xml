@@ -1,0 +1,11 @@
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeAllMask"
+    android:accessibilityFeedbackType="feedbackAllMask"
+    android:notificationTimeout="100"
+    android:canRetrieveWindowContent="true"
+    android:accessibilityFlags="flagDefault"
+    android:settingsActivity="com.example.yourapp.YourAccessibilityServiceSettingsActivity"
+    android:canRequestTouchExplorationMode="true"
+    android:canRequestEnhancedWebAccessibility="true"
+    android:canRequestFilterKeyEvents="true"
+    android:canPerformGestures="true"/>
