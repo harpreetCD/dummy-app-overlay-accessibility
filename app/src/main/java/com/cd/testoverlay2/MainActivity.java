@@ -38,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
 //            startOverlayService();
 //        }
         startService();
+
+        Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        startActivityForResult(intent, 789);
     }
 
     @Override
@@ -48,6 +51,13 @@ public class MainActivity extends AppCompatActivity {
                 if (Settings.canDrawOverlays(this)) {
                     startOverlayService();
                 }
+            }
+        }
+        if(requestCode == 789) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(new Intent(this, YourAccessibilityService.class));
+            } else {
+                startService(new Intent(this, YourAccessibilityService.class));
             }
         }
     }
