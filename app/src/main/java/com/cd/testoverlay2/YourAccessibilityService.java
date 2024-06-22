@@ -1,6 +1,7 @@
 package com.cd.testoverlay2;
 
 import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
@@ -15,15 +16,21 @@ public class YourAccessibilityService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        if (event.getPackageName().toString().equals("co.news.hub")) {
+        Log.d(TAG, "onAccessibilityEvent: " + event.toString());
+//        if (event.getPackageName().toString().equals("co.news.hub")) {
 
             AccessibilityNodeInfo source = event.getSource();
 
             if (source != null) {
-                String pcnResponse = fetchResponse(source);
-                Log.d(TAG, pcnResponse);
+                if(event.getEventType()==AccessibilityEvent.TYPE_VIEW_CLICKED) {
+                    if (source.getClassName() == "android.widget.TextView") {
+                        String text = source.getText().toString();
+                        Log.d(TAG, "onAccessibilityEvent: " + text);
+                    }
+                }
             }
-        }
+
+//        }
 //        final AccessibilityNodeInfo textNodeInfo = findTextViewNode(getRootInActiveWindow());
 //
 //        if (textNodeInfo == null) return;
@@ -41,6 +48,9 @@ public class YourAccessibilityService extends AccessibilityService {
         if (accessibilityNodeInfo != null) {
             for (int i = 0; i < accessibilityNodeInfo.getChildCount(); i++) {
                 AccessibilityNodeInfo child = accessibilityNodeInfo.getChild(i);
+                if(child!=null && child.getText()!=null) {
+                    Log.d(TAG, child.getText().toString());
+                }
                 if (child != null) {
 
                     CharSequence text = child.getText();
@@ -149,7 +159,11 @@ public class YourAccessibilityService extends AccessibilityService {
 
     @Override
     protected void onServiceConnected() {
-        super.onServiceConnected();
+        AccessibilityServiceInfo info = new AccessibilityServiceInfo();
+        info.flags = AccessibilityServiceInfo.FLAG_REQUEST_TOUCH_EXPLORATION_MODE;
+        info.eventTypes = AccessibilityEvent.TYPES_ALL_MASK;
+        info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
+        setServiceInfo(info);
         Log.d(TAG, "Accessibility Service Connected");
     }
 }

@@ -153,7 +153,7 @@ public class ForegroundService extends Service {
                             }
                             appTimes.put(lastOpenedApp, appTimes.get(lastOpenedApp)+1);
                             title.setText(formatSeconds(appTimes.get(lastOpenedApp)));
-                            Log.d("Debug:weklfhioqwefhqwe", "run: " + lastOpenedApp);
+//                            Log.d("Debug:weklfhioqwefhqwe", "run: " + lastOpenedApp);
                             apphandler.postDelayed(this, 1000); // 1000 ms = 1 second
                         }
                     };
@@ -166,11 +166,11 @@ public class ForegroundService extends Service {
                     String appName = packageManager.getApplicationLabel(applicationInfo).toString();
                     appIcon.setImageDrawable(packageManager.getApplicationIcon(applicationInfo));
                     currentApp = appName;
-                    Log.d("PackageManager", "run: ");
+//                    Log.d("PackageManager", "run: ");
                 } catch (PackageManager.NameNotFoundException e) {
 //                    throw new RuntimeException(e);
                 }
-                Log.d("PackageManager", "run: ");
+//                Log.d("PackageManager", "run: ");
 
                 handler.postDelayed(this, 0 ); // Update every second
             }
