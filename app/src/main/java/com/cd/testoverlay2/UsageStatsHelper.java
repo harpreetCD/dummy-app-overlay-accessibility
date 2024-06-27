@@ -72,7 +72,7 @@ public class UsageStatsHelper {
         return false;
     }
 
-    public static AppStateEnum printForegroundTask(Context context, String targetPackageName) {
+    public static AppStateEnum getAppStatus(Context context, String targetPackageName) {
         String currentApp = "NULL";
         UsageStatsManager usm = (UsageStatsManager) context.getSystemService("usagestats");
         long time = System.currentTimeMillis();

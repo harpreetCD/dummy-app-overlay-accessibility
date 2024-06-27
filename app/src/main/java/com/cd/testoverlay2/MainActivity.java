@@ -106,30 +106,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void launchAppWithHandler(String packageName) {
-        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(packageName);
-        launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivityForResult( launchIntent, 1111 );
-
-        final int[] killCounter = {0};
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                AppStateEnum status = UsageStatsHelper.printForegroundTask(MainActivity.this, packageName);
-                if(status == AppStateEnum.KILLED) {
-                    killCounter[0]++;
-                }
-                if(killCounter[0] == 5) {
-                    Log.d(TAG, "foregroundApp: " + packageName+ " App state: " + status);
-                } else{
-                    Log.d(TAG, "foregroundApp: " + packageName+ " App state: " + status);
-                    handler.postDelayed(this, 1000);
-                }
-            }
-        }, 0);
-    }
-
     private boolean hasUsageStatsPermission(Context context) {
         AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), context.getPackageName());

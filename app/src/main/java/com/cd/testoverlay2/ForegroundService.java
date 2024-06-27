@@ -197,24 +197,17 @@ public class ForegroundService extends Service {
         launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getApplicationContext().startActivity(launchIntent);
 
-        final int[] killCounter = {0};
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                AppStateEnum status = UsageStatsHelper.printForegroundTask(getApplicationContext(), packageName);
-                if(status == AppStateEnum.KILLED) {
-                    killCounter[0]++;
+                AppStateEnum status = UsageStatsHelper.getAppStatus(getApplicationContext(), packageName);
+                Log.d(TAG, "foregroundApp: " + packageName+ " App state: " + status);
+                if(status == AppStateEnum.RUNNING) {
+                    handler.postDelayed(this, 1000);
                 }
-                if(killCounter[0] == 5) {
-                    Log.d(TAG, "foregroundApp: " + packageName+ " App state: " + status);
-                } else{
-                    Log.d(TAG, "foregroundApp: " + packageName+ " App state: " + status);
-
-                }
-                handler.postDelayed(this, 1000);
             }
-        }, 0);
+        }, 1000);
 
         return super.onStartCommand(intent, flags, startId);
     }
