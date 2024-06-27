@@ -52,30 +52,82 @@ public class MainActivity extends AppCompatActivity {
 //        } else {
 //            startOverlayService();
 //        }
-        startService();
 
 //        Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
 //        startActivityForResult(intent, 789);
 
         Button openAppBtn = findViewById(R.id.openBtn);
+        Button openApp2 = findViewById(R.id.openApp2);
+        Button openApp3 = findViewById(R.id.openApp3);
 
         openAppBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.JindoBlu.FourPlayers");
-                startActivityForResult( launchIntent, 1111 );
+                startService("com.flipkart.android");
+//                launchAppWithHandler("com.flipkart.android");
+//                Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.flipkart.android");
+//                launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivityForResult( launchIntent, 1111 );
             }
         });
 
+        openApp2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startService("com.collegedunia.studyabroad");
+//                launchAppWithHandler("com.collegedunia.studyabroad");
+            }
+        });
+
+        openApp3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startService("co.news.hub");
+//                launchAppWithHandler("co.news.hub");
+            }
+        });
+//        final int[] killCounter = {0};
+//        Handler handler = new Handler();
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                AppStateEnum status = UsageStatsHelper.printForegroundTask(MainActivity.this, "com.flipkart.android");
+////                if(status == AppStateEnum.KILLED) {
+////                    killCounter[0]++;
+////                }
+////                if(killCounter[0] == 5) {
+////                    Log.d(TAG, "foregroundApp: " + packageName+ " App state: " + status);
+////                } else{
+//                    Log.d(TAG, "foregroundApp: " + "com.flipkart.android"+ " App state: " + status);
+//                    handler.postDelayed(this, 1000);
+////                }
+//            }
+//        }, 0);
+
+    }
+
+    private void launchAppWithHandler(String packageName) {
+        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(packageName);
+        launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivityForResult( launchIntent, 1111 );
+
+        final int[] killCounter = {0};
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                String foregroundApp = UsageStatsHelper.getForegroundApp(MainActivity.this);
-                Log.d(TAG, "foregroundApp: " + foregroundApp);
-                handler.postDelayed(this, 10000);
+                AppStateEnum status = UsageStatsHelper.printForegroundTask(MainActivity.this, packageName);
+                if(status == AppStateEnum.KILLED) {
+                    killCounter[0]++;
+                }
+                if(killCounter[0] == 5) {
+                    Log.d(TAG, "foregroundApp: " + packageName+ " App state: " + status);
+                } else{
+                    Log.d(TAG, "foregroundApp: " + packageName+ " App state: " + status);
+                    handler.postDelayed(this, 1000);
+                }
             }
-        }, 10000);
+        }, 0);
     }
 
     private boolean hasUsageStatsPermission(Context context) {
@@ -119,14 +171,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void startService(){
+    public void startService(String packageName){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // check if the user has already granted
             // the Draw over other apps permission
             if(Settings.canDrawOverlays(this)) {
                 // start the service based on the android version
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(new Intent(this, ForegroundService.class));
+                    Intent intent = new Intent(this, ForegroundService.class);
+                    intent.putExtra("package_name", packageName);
+                    startForegroundService(intent);
                 } else {
                     startService(new Intent(this, ForegroundService.class));
                 }

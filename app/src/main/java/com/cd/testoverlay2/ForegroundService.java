@@ -1,12 +1,10 @@
 package com.cd.testoverlay2;
 
-import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
-import android.app.usage.UsageStats;
-import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -16,7 +14,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -30,13 +27,13 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ForegroundService extends Service {
 
+    private static final String TAG = ForegroundService.class.getSimpleName();
     private Handler handler;
     WindowManager.LayoutParams mParams = null;
     LayoutInflater layoutInflater;
@@ -106,6 +103,8 @@ public class ForegroundService extends Service {
         mWindowManager.addView(mView, mParams);
         handler = new Handler();
         startUpdatingAppName();
+
+
     }
 
     private String lastOpenedApp;
@@ -191,6 +190,32 @@ public class ForegroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        String packageName = intent.getStringExtra("package_name");
+        Log.d(TAG, "onStartCommand: " + packageName);
+
+        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(packageName);
+        launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getApplicationContext().startActivity(launchIntent);
+
+        final int[] killCounter = {0};
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                AppStateEnum status = UsageStatsHelper.printForegroundTask(getApplicationContext(), packageName);
+                if(status == AppStateEnum.KILLED) {
+                    killCounter[0]++;
+                }
+                if(killCounter[0] == 5) {
+                    Log.d(TAG, "foregroundApp: " + packageName+ " App state: " + status);
+                } else{
+                    Log.d(TAG, "foregroundApp: " + packageName+ " App state: " + status);
+
+                }
+                handler.postDelayed(this, 1000);
+            }
+        }, 0);
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -239,4 +264,6 @@ public class ForegroundService extends Service {
             Log.d("Error2", e.toString());
         }
     }
+
+
 }
